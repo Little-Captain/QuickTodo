@@ -32,6 +32,24 @@ struct TasksViewModel {
     let sceneCoordinator: SceneCoordinatorType
     let taskService: TaskServiceType
     
+    lazy var editAction: Action<TaskItem, Swift.Never> = { this in
+        return Action { task in
+            let editViewModel = EditTaskViewModel(
+                task: task,
+                coordinator: this.sceneCoordinator,
+                updateAction: this.onUpdateTitle(task: task)
+            )
+            return this.sceneCoordinator
+                .transition(to: .editTask(editViewModel), type: .modal)
+                .asObservable()
+        }
+    }(self)
+    
+    // chanllenge 1
+    lazy var deleteAction: Action<TaskItem, Void> = { service in
+        return Action { service.delete(task: $0) }
+    }(self.taskService)
+    
     var sectionedItems: Observable<[TaskSection]> {
         return taskService
             .tasks()

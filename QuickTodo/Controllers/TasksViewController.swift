@@ -50,7 +50,21 @@ class TasksViewController: UIViewController, BindableType {
             .sectionedItems
             .bind(to: tableView.rx.items(dataSource: dataSource))
             .disposed(by: rx.disposeBag)
+        
         newTaskButton.rx.action = viewModel.onCreateTask()
+        
+        tableView
+            .rx.itemSelected
+            .do(onNext: { [unowned self] in self.tableView.deselectRow(at: $0, animated: false) })
+            .map { [unowned self] in try! self.dataSource.model(at: $0) as! TaskItem }
+            .bind(to: viewModel.editAction.inputs)
+            .disposed(by: rx.disposeBag)
+        
+        tableView
+            .rx.itemDeleted
+            .map { [unowned self] in try! self.tableView.rx.model(at: $0) }
+            .bind(to: viewModel.deleteAction.inputs)
+            .disposed(by: rx.disposeBag)
     }
     
     fileprivate func configureDataSource() {
@@ -62,9 +76,9 @@ class TasksViewController: UIViewController, BindableType {
                 }
                 return cell
             },
-            titleForHeaderInSection: { dataSource, index in
-                dataSource.sectionModels[index].model
-        })
+            titleForHeaderInSection: { $0.sectionModels[$1].model },
+            canEditRowAtIndexPath: { _, _ in true }
+        )
     }
     
 }
