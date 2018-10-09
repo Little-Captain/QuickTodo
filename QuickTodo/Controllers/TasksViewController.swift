@@ -50,6 +50,7 @@ class TasksViewController: UIViewController, BindableType {
             .sectionedItems
             .bind(to: tableView.rx.items(dataSource: dataSource))
             .disposed(by: rx.disposeBag)
+        newTaskButton.rx.action = viewModel.onCreateTask()
     }
     
     fileprivate func configureDataSource() {
