@@ -60,11 +60,20 @@ class TasksViewController: UIViewController, BindableType {
             .bind(to: viewModel.editAction.inputs)
             .disposed(by: rx.disposeBag)
         
+        // challenge 1
         tableView
             .rx.itemDeleted
             .map { [unowned self] in try! self.tableView.rx.model(at: $0) }
             .bind(to: viewModel.deleteAction.inputs)
             .disposed(by: rx.disposeBag)
+        
+        // challenge 2
+        viewModel
+            .statistics
+            .map { "\($0.todo + $0.done) tasks, \($0.todo) due." }
+            .bind(to: statisticsLabel.rx.text)
+            .disposed(by: rx.disposeBag)
+        
     }
     
     fileprivate func configureDataSource() {

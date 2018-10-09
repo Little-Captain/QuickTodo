@@ -50,6 +50,9 @@ struct TasksViewModel {
         return Action { service.delete(task: $0) }
     }(self.taskService)
     
+    // chanllenge 2
+    lazy var statistics: Observable<TaskStatistics> = taskService.statistics()
+    
     var sectionedItems: Observable<[TaskSection]> {
         return taskService
             .tasks()
