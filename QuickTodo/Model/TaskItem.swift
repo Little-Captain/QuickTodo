@@ -37,3 +37,11 @@ class TaskItem: Object {
     }
     
 }
+
+extension TaskItem: IdentifiableType {
+    
+    var identity: Int {
+        return isInvalidated ? 0 : uid
+    }
+    
+}

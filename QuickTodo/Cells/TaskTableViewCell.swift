@@ -25,13 +25,30 @@ import Action
 import RxSwift
 
 class TaskItemTableViewCell: UITableViewCell {
-
-  @IBOutlet var title: UILabel!
-  @IBOutlet var button: UIButton!
-  var disposeBag = DisposeBag()
-
-  func configure(with item: TaskItem, action: CocoaAction) {
     
-  }
-
+    @IBOutlet var title: UILabel!
+    @IBOutlet var button: UIButton!
+    var disposeBag = DisposeBag()
+    
+    func configure(with item: TaskItem, action: CocoaAction) {
+        button.rx.action = action
+        item
+            .rx.observe(String.self, "title")
+            .asDriver(onErrorJustReturn: nil)
+            .drive(title.rx.text)
+            .disposed(by: disposeBag)
+        item
+            .rx.observe(Date.self, "checked")
+            .map { UIImage(named: $0 == nil ? "ItemNotChecked" : "ItemChecked") }
+            .asDriver(onErrorJustReturn: nil)
+            .drive(button.rx.image(for: .normal))
+            .disposed(by: disposeBag)
+    }
+    
+    override func prepareForReuse() {
+        button.rx.action = nil
+        disposeBag = DisposeBag()
+        super.prepareForReuse()
+    }
+    
 }
